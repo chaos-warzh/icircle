@@ -24,7 +24,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: 123456
-          MYSQL_DATABASE: BlueWhale
+          MYSQL_DATABASE: IC
         ports:
           - "3306:3306"
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -34,7 +34,7 @@ jobs:
       DB_PORT: 3306
       DB_USER: root
       DB_PASS: 123456
-      DB_NAME: BlueWhale
+      DB_NAME: IC
 
     steps:
       - uses: actions/checkout@v4
@@ -47,4 +47,4 @@ jobs:
       - name: Maven build
         run: mvn -B clean install -DskipTests
         env:
-          MAVEN_OPTS: "-Dspring-boot.run.arguments=--server.port=8080 --spring.datasource.url=jdbc:mysql://$DB_HOST:$DB_PORT/$DB_NAME?useSSL=false --spring.datasource.username=$DB_USER --spring.datasource.password=$DB_PASS"
+          MAVEN_OPTS: "-Dspring-boot.run.arguments=--server.port=8080"
