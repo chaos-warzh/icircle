@@ -22,32 +22,21 @@ public class UserVO {
 
     private String password;
 
-    private Integer storeId;
-
-    private String address;
+    private List<Integer> circleIds;
 
     private RoleEnum role;
 
     private Date createTime;
 
-    private String storeName;
-
-    private List<String> deliveryAddresses;
-
-    private List<String> deliveryPhoneNumbers;
-
-    public User toPO(){
-        User user=new User();
+    public User toPO() {
+        User user = new User();
         user.setId(this.id);
-        user.setAddress(this.address);
         user.setName(this.name);
         user.setPhone(this.phone);
-        user.setRole(this.role);
-        user.setStoreId(this.storeId);
         user.setPassword(this.password);
+        user.setCircleIds(this.circleIds);
+        user.setRole(this.role);
         user.setCreateTime(this.createTime);
-        user.setDeliveryAddresses(this.deliveryAddresses);
-        user.setDeliveryPhoneNumbers(this.deliveryPhoneNumbers);
         return user;
     }
 }

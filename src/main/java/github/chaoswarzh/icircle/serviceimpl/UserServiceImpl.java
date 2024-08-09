@@ -1,17 +1,13 @@
 package github.chaoswarzh.icircle.serviceimpl;
 
-import github.chaoswarzh.icircle.enums.RoleEnum;
 import github.chaoswarzh.icircle.exception.ICircleException;
-import github.chaoswarzh.icircle.repository.StoreRepository;
 import github.chaoswarzh.icircle.repository.UserRepository;
-import github.chaoswarzh.icircle.po.Store;
 import github.chaoswarzh.icircle.po.User;
 import github.chaoswarzh.icircle.service.UserService;
 import github.chaoswarzh.icircle.util.SecurityUtil;
 import github.chaoswarzh.icircle.util.TokenUtil;
 import github.chaoswarzh.icircle.vo.UserVO;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 
@@ -34,9 +30,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     SecurityUtil securityUtil;
 
-    @Autowired
-    StoreRepository storeRepository;
-
     @Override
     public Boolean register(UserVO userVO) {
         logger.info("register phone:{}",userVO.getPhone());
@@ -47,13 +40,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User newUser = userVO.toPO();
-        newUser.setDeliveryPhoneNumbers(new ArrayList<>());
-        newUser.setDeliveryAddresses(new ArrayList<>());
 
-        if(newUser.getRole() == RoleEnum.USER){
-            newUser.getDeliveryAddresses().add(newUser.getAddress());
-            newUser.getDeliveryPhoneNumbers().add(newUser.getPhone());
-        }
         newUser.setCreateTime(new Date());
         userRepository.save(newUser);
 
@@ -79,11 +66,6 @@ public class UserServiceImpl implements UserService {
     public UserVO getInformation() {
         User user=securityUtil.getCurrentUser();
         logger.info("get information: userId:{}",user.getId());
-
-        if (user.getRole().equals(RoleEnum.STAFF)) {
-            return wrapWithStoreName(user.toVO());
-        }
-
         logger.info("get success");
         return user.toVO();
     }
@@ -96,26 +78,11 @@ public class UserServiceImpl implements UserService {
 
         Optional.ofNullable(userVO.getPassword()).ifPresent(user::setPassword);
         Optional.ofNullable(userVO.getName()).ifPresent(user::setName);
-        Optional.ofNullable(userVO.getAddress()).ifPresent(user::setAddress);
-
-        // address and phone number:
-        if(user.getRole().equals(RoleEnum.USER)){
-            Optional.ofNullable(userVO.getDeliveryAddresses()).ifPresent(user::setDeliveryAddresses);
-            Optional.ofNullable(userVO.getDeliveryPhoneNumbers()).ifPresent(user::setDeliveryPhoneNumbers);
-        }
+        Optional.ofNullable(userVO.getCircleIds()).ifPresent(user::setCircleIds);
 
         logger.info("update success");
         userRepository.save(user);
         return true;
     }
 
-    private UserVO wrapWithStoreName(UserVO userVO){
-        Integer storeId = userVO.getStoreId();
-        if (storeId==null){
-            return userVO;
-        }
-        Store store = storeRepository.findById(storeId).get();
-        userVO.setStoreName(store.getName());
-        return userVO;
-    }
 }

@@ -16,7 +16,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,41 +42,28 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Basic
-    @Column(name = "create_time")
-    private Date createTime;
 
-    @Basic
-    @Column(name = "store_id")
-    private Integer storeId;
-
-    @Basic
-    @Column(name = "address")
-    private String address;
+    @ElementCollection(fetch = FetchType.LAZY)
+    private List<Integer> circleIds;
 
     @Basic
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<String> deliveryAddresses;
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    private List<String> deliveryPhoneNumbers;
+    @Basic
+    @Column(name = "create_time")
+    private Date createTime;
 
     public UserVO toVO() {
-        UserVO userVO=new UserVO();
+        UserVO userVO = new UserVO();
         userVO.setId(this.id);
-        userVO.setAddress(this.address);
         userVO.setName(this.name);
-        userVO.setRole(this.role);
-        userVO.setStoreId(this.storeId);
         userVO.setPhone(this.phone);
         userVO.setPassword(this.password);
+        userVO.setCircleIds(this.circleIds);
+        userVO.setRole(this.role);
         userVO.setCreateTime(this.createTime);
-        userVO.setDeliveryAddresses(new ArrayList<>(this.deliveryAddresses));
-        userVO.setDeliveryPhoneNumbers(new ArrayList<>(this.deliveryPhoneNumbers));
         return userVO;
     }
 }
