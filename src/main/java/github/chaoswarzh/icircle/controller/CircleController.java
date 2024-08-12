@@ -46,4 +46,9 @@ public class CircleController {
         return ResultVO.buildSuccess(circleService.getCommentCount(id));
     }
 
+    @GetMapping("/{id}/activeUserCount")
+    public ResultVO<Integer> getActiveUserCount(@PathVariable(value = "id") Integer id) {
+        return ResultVO.buildSuccess(circleService.getActiveUserCount(id));
+    }
+
 }

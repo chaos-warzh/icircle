@@ -3,9 +3,12 @@ package github.chaoswarzh.icircle.serviceimpl;
 import github.chaoswarzh.icircle.exception.ICircleException;
 import github.chaoswarzh.icircle.po.Post;
 import github.chaoswarzh.icircle.po.Circle;
+import github.chaoswarzh.icircle.po.User;
 import github.chaoswarzh.icircle.repository.PostRepository;
 import github.chaoswarzh.icircle.repository.CircleRepository;
+import github.chaoswarzh.icircle.repository.UserRepository;
 import github.chaoswarzh.icircle.service.PostService;
+import github.chaoswarzh.icircle.util.SecurityUtil;
 import github.chaoswarzh.icircle.vo.PostVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,12 @@ public class PostServiceImpl implements PostService {
     @Autowired
     CircleRepository circleRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public Boolean create(PostVO postVO) {
         logger.info("create post titled:{}", postVO.getName());
@@ -38,6 +47,18 @@ public class PostServiceImpl implements PostService {
         Post post = postVO.toPO();
         post.setCommentNumber(0);
         postRepository.save(post);
+
+        User user = securityUtil.getCurrentUser();
+        int circleId = post.getCircleId();
+        if (circleRepository.findById(circleId).isPresent()) {
+            Circle circle = circleRepository.findById(circleId).get();
+            circle.setCommentNumber(circle.getCommentNumber() + 1);
+            if (!user.getCircleIds().contains(post.getCircleId())) {
+                user.getCircleIds().add(post.getCircleId());
+                userRepository.save(user);
+                circle.setActiveUserNum(circle.getActiveUserNum() + 1);
+            }
+        }
 
         logger.info("create post success");
         return true;

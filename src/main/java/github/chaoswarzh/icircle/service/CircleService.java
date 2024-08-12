@@ -16,4 +16,7 @@ public interface CircleService {
 
     Integer getCommentCount(Integer id);
 
+    Integer getActiveUserCount(Integer id);
+
+    List<CircleVO> getUserActiveCircles();
 }

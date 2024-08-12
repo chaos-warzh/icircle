@@ -1,11 +1,16 @@
 package github.chaoswarzh.icircle.serviceimpl;
 
 import github.chaoswarzh.icircle.exception.ICircleException;
+import github.chaoswarzh.icircle.po.Circle;
 import github.chaoswarzh.icircle.po.Comment;
 import github.chaoswarzh.icircle.po.Post;
+import github.chaoswarzh.icircle.po.User;
+import github.chaoswarzh.icircle.repository.CircleRepository;
 import github.chaoswarzh.icircle.repository.CommentRepository;
 import github.chaoswarzh.icircle.repository.PostRepository;
+import github.chaoswarzh.icircle.repository.UserRepository;
 import github.chaoswarzh.icircle.service.CommentService;
+import github.chaoswarzh.icircle.util.SecurityUtil;
 import github.chaoswarzh.icircle.vo.CommentVO;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,15 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CircleRepository circleRepository;
+
     @Override
     public Boolean create(Integer postId, CommentVO commentVO) {
         logger.info("create comment on post:{}", postId);
@@ -49,6 +63,18 @@ public class CommentServiceImpl implements CommentService {
         post.setCommentNumber(post.getCommentNumber() + 1);
         post.getCommentIdList().add(comment.getId());
         postRepository.save(post);
+
+        User user = securityUtil.getCurrentUser();
+        int circleId = post.getCircleId();
+        if (circleRepository.findById(circleId).isPresent()) {
+            Circle circle = circleRepository.findById(circleId).get();
+            circle.setCommentNumber(circle.getCommentNumber() + 1);
+            if (!user.getCircleIds().contains(post.getCircleId())) {
+                user.getCircleIds().add(post.getCircleId());
+                userRepository.save(user);
+                circle.setActiveUserNum(circle.getActiveUserNum() + 1);
+            }
+        }
 
         logger.info("create comment success");
         return true;

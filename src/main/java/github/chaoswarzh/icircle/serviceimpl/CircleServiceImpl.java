@@ -2,8 +2,10 @@ package github.chaoswarzh.icircle.serviceimpl;
 
 import github.chaoswarzh.icircle.exception.ICircleException;
 import github.chaoswarzh.icircle.po.Circle;
+import github.chaoswarzh.icircle.po.User;
 import github.chaoswarzh.icircle.repository.CircleRepository;
 import github.chaoswarzh.icircle.service.CircleService;
+import github.chaoswarzh.icircle.util.SecurityUtil;
 import github.chaoswarzh.icircle.vo.CircleVO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,9 @@ public class CircleServiceImpl implements CircleService {
 
     @Autowired
     CircleRepository circleRepository;
+
+    @Autowired
+    private SecurityUtil securityUtil;
 
     @Override
     public Boolean create(CircleVO circleVO) {
@@ -105,5 +111,28 @@ public class CircleServiceImpl implements CircleService {
 
         logger.info("get circle comment count success");
         return circle.getCommentNumber();
+    }
+
+    @Override
+    public Integer getActiveUserCount(Integer id) {
+        logger.info("get circle active user count, circle id:{}", id);
+
+        Circle circle = circleRepository.findById(id).orElse(null);
+        if (circle == null) {
+            logger.info("circle not exists");
+            throw ICircleException.circleNotExists();
+        }
+
+        logger.info("get circle active user count success");
+        return circle.getActiveUserNum();
+    }
+
+    @Override
+    public List<CircleVO> getUserActiveCircles() {
+        User user = securityUtil.getCurrentUser();
+        logger.info("get user active circles, userId:{}", user.getId());
+
+        List<Circle> circles = circleRepository.findAllById(user.getCircleIds());
+        return circles.stream().map(Circle::toVO).collect(Collectors.toList());
     }
 }

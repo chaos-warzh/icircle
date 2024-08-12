@@ -1,15 +1,15 @@
 package github.chaoswarzh.icircle.controller;
 
+import github.chaoswarzh.icircle.po.Circle;
+import github.chaoswarzh.icircle.service.CircleService;
 import github.chaoswarzh.icircle.service.UserService;
+import github.chaoswarzh.icircle.vo.CircleVO;
 import github.chaoswarzh.icircle.vo.ResultVO;
 import github.chaoswarzh.icircle.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,6 +17,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    CircleService circleService;
 
     @PostMapping("/register")
     public ResultVO<Boolean> register(@RequestBody UserVO userVO) {
@@ -39,5 +42,10 @@ public class UserController {
     @PostMapping
     public ResultVO<Boolean> updateInformation(@RequestBody UserVO userVO) {
         return ResultVO.buildSuccess(userService.updateInformation(userVO));
+    }
+
+    @GetMapping("/circles")
+    public ResultVO<List<CircleVO>> getActiveCircles() {
+        return ResultVO.buildSuccess(circleService.getUserActiveCircles());
     }
 }
