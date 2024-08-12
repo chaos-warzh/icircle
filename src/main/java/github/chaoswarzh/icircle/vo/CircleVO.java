@@ -22,7 +22,7 @@ public class CircleVO {
     private Integer activeUserNum;
 
     public Circle toPO() {
-        Circle circle =new Circle();
+        Circle circle = new Circle();
         circle.setId(this.id);
         circle.setLogoUrl(this.logoUrl);
         circle.setName(this.name);
