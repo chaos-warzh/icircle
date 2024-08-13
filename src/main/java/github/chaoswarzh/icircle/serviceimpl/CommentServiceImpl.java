@@ -73,6 +73,7 @@ public class CommentServiceImpl implements CommentService {
                 user.getCircleIds().add(post.getCircleId());
                 userRepository.save(user);
                 circle.setActiveUserNum(circle.getActiveUserNum() + 1);
+                circleRepository.save(circle);
             }
         }
 
